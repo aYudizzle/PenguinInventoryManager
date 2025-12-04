@@ -1,42 +1,30 @@
-This is a Kotlin Multiplatform project targeting Android, Desktop (JVM).
+🐧 Penguin Inventory Manager (PIM)
+Eine Offline-First Inventory App, entwickelt mit Kotlin Multiplatform (KMP) und Compose Multiplatform für Android und Desktop.
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-    - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-    - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-      For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-      the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-      Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-      folder is the appropriate location.
+Dieses Projekt demonstriert eine robuste Clean Architecture und eine komplexe Synchronisations-Logik zwischen lokalem Client und einem Laravel-Backend.
 
-### Build and Run Android Application
+🌟 Key Features
+Offline-First Architektur: Volle Funktionalität ohne Internetverbindung dank lokaler Datenbank.
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
+Robuster Sync: Eigener SyncManager mit Batch-Processing, Konfliktlösung ("Last Write Wins") und Soft-Delete Support.
 
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+Modern UI: Material 3 Design mit Adaptive Layouts, Sticky Headers und Custom Components.
 
-### Build and Run Desktop (JVM) Application
+Datensicherheit: Nutzung von UUIDs zur Vermeidung von ID-Kollisionen in verteilten Systemen.
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
+🛠 Tech Stack
+UI: Compose Multiplatform (Android + JVM/Desktop)
 
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
+Architecture: Clean Architecture (Core/Feature Modularization), MVVM
 
----
+Dependency Injection: Koin
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+Local Data: Room KMP (SQLite)
+
+Network: Ktor Client (Content Negotiation, Logging)
+
+Settings: DataStore (Type-Safe mit Kotlin Serialization)
+
+Concurrency: Kotlin Coroutines & Flows
+
+Utils: Kotlinx-Datetime, Napier (Logging), Konnectivity (Network Monitor)
