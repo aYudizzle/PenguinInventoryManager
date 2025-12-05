@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "dev.ayupi.pse_new.core.datastore"
+        namespace = "dev.ayupi.pim.core.datastore"
     }
 
     sourceSets {

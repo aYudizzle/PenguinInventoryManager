@@ -8,7 +8,7 @@ kotlin {
     // which platforms this KMP module supports.
     // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
-        namespace = "dev.ayupi.pse_new.feature.storageoverview"
+        namespace = "dev.ayupi.pim.feature.storageoverview"
     }
 
     sourceSets {

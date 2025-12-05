@@ -6,7 +6,7 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "dev.ayupi.pse_new.core.ui"
+        namespace = "dev.ayupi.pim.core.ui"
     }
     sourceSets {
         commonMain.dependencies {

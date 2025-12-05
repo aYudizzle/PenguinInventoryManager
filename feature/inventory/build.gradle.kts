@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "dev.ayupi.pse_new.feature.inventory"
+        namespace = "dev.ayupi.pim.feature.inventory"
     }
 
     sourceSets {

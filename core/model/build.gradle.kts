@@ -8,7 +8,7 @@ kotlin {
     // which platforms this KMP module supports.
     // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
-        namespace = "dev.ayupi.pse_new.core.model"
+        namespace = "dev.ayupi.pim.core.model"
     }
 
     sourceSets {

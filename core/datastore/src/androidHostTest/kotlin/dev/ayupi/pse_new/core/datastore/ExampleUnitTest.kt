@@ -1,4 +1,4 @@
-package dev.ayupi.pse_new.core.datastore
+package dev.ayupi.pim.core.datastore
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

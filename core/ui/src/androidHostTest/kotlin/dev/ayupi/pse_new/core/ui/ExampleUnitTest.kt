@@ -1,4 +1,4 @@
-package dev.ayupi.pse_new.core.ui
+package dev.ayupi.pim.core.ui
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

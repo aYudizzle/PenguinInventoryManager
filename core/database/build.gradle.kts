@@ -15,7 +15,7 @@ kotlin {
     }
 
     androidLibrary {
-        namespace = "dev.ayupi.pse_new.core.database"
+        namespace = "dev.ayupi.pim.core.database"
     }
 
     sourceSets {

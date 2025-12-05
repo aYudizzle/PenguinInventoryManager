@@ -1,4 +1,4 @@
-package dev.ayupi.pse_new.feature.inventory
+package dev.ayupi.pim.feature.inventory
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -55,16 +55,17 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+            implementation(compose.components.resources)
         }
     }
 }
 
 android {
-    namespace = "dev.ayupi.pse_new"
+    namespace = "dev.ayupi.pim"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "dev.ayupi.pse_new"
+        applicationId = "dev.ayupi.pim"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -92,12 +93,33 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "dev.ayupi.pse_new.MainKt"
+        mainClass = "dev.ayupi.pim.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "dev.ayupi.pse_new"
+            packageName = "Penguin Inventory Manager"
             packageVersion = "1.0.0"
+
+            description = "Die smarte Offline-First Lagerverwaltung"
+            vendor = "ayupi.dev"
+
+            macOS {
+                iconFile.set(project.file("src/jvmMain/resources/launcher/pimlogo.icns"))
+                bundleID = "dev.ayupi.pim"
+                dockName = "PIM"
+            }
+
+            windows {
+                upgradeUuid = "44f3262b-bbf5-47e6-948d-2bd1eecdbf74"
+                menuGroup = "ayupi software"
+                shortcut = true
+                iconFile.set(project.file("src/jvmMain/resources/launcher/pimlogo.ico"))
+            }
+
+            linux {
+                packageName = "penguin-inventory-manager"
+                iconFile.set(project.file("src/jvmMain/resources/launcher/pimlogo.png"))
+            }
         }
     }
 }

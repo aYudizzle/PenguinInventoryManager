@@ -1,4 +1,4 @@
-package dev.ayupi.pse_new.core.database
+package dev.ayupi.pim.core.database
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -1,4 +1,4 @@
-package dev.ayupi.pse_new.feature.itemmaster
+package dev.ayupi.pim.feature.itemmaster
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

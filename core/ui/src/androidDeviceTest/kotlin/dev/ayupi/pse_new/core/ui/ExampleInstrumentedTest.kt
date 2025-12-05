@@ -1,4 +1,4 @@
-package dev.ayupi.pse_new.core.ui
+package dev.ayupi.pim.core.ui
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("dev.ayupi.pse_new.core.ui.test", appContext.packageName)
+        assertEquals("dev.ayupi.pim.core.ui.test", appContext.packageName)
     }
 }

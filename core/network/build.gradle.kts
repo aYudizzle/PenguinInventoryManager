@@ -1,6 +1,5 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.ayupi.kmp.library)
@@ -10,7 +9,7 @@ plugins {
 
 
 buildkonfig {
-    packageName = "dev.ayupi.pse_new.core.network"
+    packageName = "dev.ayupi.pim.core.network"
 
     val apiKey: String = gradleLocalProperties(rootDir, providers).getProperty("API_KEY", "")
     val baseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("API_URL", "localhost")
@@ -27,7 +26,7 @@ kotlin {
     // which platforms this KMP module supports.
     // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
-        namespace = "dev.ayupi.pse_new.core.network"
+        namespace = "dev.ayupi.pim.core.network"
     }
 
     sourceSets {
