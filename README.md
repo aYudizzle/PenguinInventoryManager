@@ -1,5 +1,6 @@
+<div align="center">
 <img width="150" height="150" alt="pimlogo" src="https://github.com/user-attachments/assets/aaa4e871-c4c9-412d-a07c-d7361517f82f" />
-
+</div>
 # 🐧 Penguin Inventory Manager (PIM)
 
 **Die intelligente Offline-First Lagerverwaltung für Android & Desktop.**
