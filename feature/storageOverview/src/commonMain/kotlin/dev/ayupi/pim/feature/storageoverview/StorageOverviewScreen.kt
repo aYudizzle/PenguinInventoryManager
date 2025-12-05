@@ -338,10 +338,10 @@ fun AddEditStorageDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Produkt umbenennen") },
+        title = { Text("Lager hinzufügen/editieren") },
         text = {
             Column {
-                Text("Ändere den Namen für alle Lagerorte.")
+                Text("Ändere den Namen den Lagerort.")
                 Spacer(Modifier.height(16.dp))
                 OutlinedTextField(
                     value = text,
