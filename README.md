@@ -110,3 +110,7 @@ Das Projekt ist modular aufgebaut, um eine saubere Trennung der Zuständigkeiten
 ### 💡 Lizenz
 
 Copyright © 2025 ayupi.dev
+
+Penguin Inventory Manager - Architecture:
+<img width="1068" height="805" alt="image" src="https://github.com/user-attachments/assets/8e5c5f27-a953-4862-ba95-463271745e73" />
+
