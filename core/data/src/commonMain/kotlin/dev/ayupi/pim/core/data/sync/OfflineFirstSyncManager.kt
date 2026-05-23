@@ -210,6 +210,8 @@ class OfflineFirstSyncManager(
                 id = id,
                 name = dto.name,
                 barcode = dto.barcode,
+                itemSize = dto.itemSize,
+                unit = dto.unit,
                 createdAt = dto.createdAt,
                 updatedAt = dto.updatedAt,
                 deletedAt = null,
@@ -232,6 +234,8 @@ class OfflineFirstSyncManager(
             id = Uuid.parse(dto.item.id),
             name = dto.item.name,
             barcode = dto.item.barcode,
+            itemSize = dto.item.itemSize,
+            unit = dto.item.unit,
             updatedAt = dto.updatedAt,
             createdAt = dto.updatedAt,
             deletedAt = null,
@@ -256,8 +260,6 @@ class OfflineFirstSyncManager(
             itemId = Uuid.parse(dto.item.id),
 
             quantity = dto.quantityInfo.count,
-            itemSize = dto.quantityInfo.sizePerUnit,
-            unit = dto.quantityInfo.unit,
             expirationDate = dto.expirationDate,
 
             // Server Authority: Wir übernehmen Zeitstempel

@@ -7,10 +7,11 @@ data class StorageItem(
     val id: String,
     val item: Item,
     val storage: Storage,
-    val itemSize: Int,
     val quantity: Long,
-    val unit: StorageUnit,
     val expirationDate: LocalDate?,
     val createdAt: Instant,
     val updatedAt: Instant,
-)
+) {
+    val itemSize: Int get() = item.itemSize
+    val unit: StorageUnit get() = item.unit
+}

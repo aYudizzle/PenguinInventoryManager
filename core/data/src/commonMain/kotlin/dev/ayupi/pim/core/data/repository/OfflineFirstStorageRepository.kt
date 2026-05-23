@@ -72,6 +72,8 @@ class OfflineFirstStorageRepository(
                         id = newUuid,
                         name = itemName,
                         barcode = barcode,
+                        itemSize = itemSize,
+                        unit = unit.abbreviation,
                         createdAt = now,
                         updatedAt = now,
                         isDirty = true,
@@ -82,8 +84,16 @@ class OfflineFirstStorageRepository(
                 } else {
                     val existingUuid = Uuid.parse(itemId)
                     val existingItem = itemDao.getById(existingUuid)
-                    if (existingItem != null && existingItem.barcode != barcode) {
-                        itemDao.upsert(existingItem.copy(barcode = barcode, isDirty = true, updatedAt = now))
+                    if (existingItem != null && (existingItem.barcode != barcode || existingItem.itemSize != itemSize || existingItem.unit != unit.abbreviation)) {
+                        itemDao.upsert(
+                            existingItem.copy(
+                                barcode = barcode,
+                                itemSize = itemSize,
+                                unit = unit.abbreviation,
+                                isDirty = true,
+                                updatedAt = now
+                            )
+                        )
                     }
                     existingUuid
                 }
@@ -101,8 +111,6 @@ class OfflineFirstStorageRepository(
                     itemId = finalItemId,
                     storageId = Uuid.parse(storageId),
                     quantity = quantity,
-                    unit = unit.abbreviation,
-                    itemSize = itemSize,
                     expirationDate = expiration,
 
                     createdAt = createdAt,
@@ -149,6 +157,32 @@ class OfflineFirstStorageRepository(
 
         val updatedItem = existing.copy(
             name = newName,
+            updatedAt = now,
+            isDirty = true
+        )
+
+        itemDao.upsert(updatedItem)
+
+        trySync()
+    }
+
+    override suspend fun updateMasterItem(
+        id: String,
+        newName: String,
+        barcode: String?,
+        itemSize: Int,
+        unit: StorageUnit
+    ) {
+        val now = Clock.System.now()
+        val uuid = Uuid.parse(id)
+
+        val existing = itemDao.getById(uuid) ?: return
+
+        val updatedItem = existing.copy(
+            name = newName,
+            barcode = barcode?.takeIf { it.isNotBlank() },
+            itemSize = itemSize,
+            unit = unit.abbreviation,
             updatedAt = now,
             isDirty = true
         )

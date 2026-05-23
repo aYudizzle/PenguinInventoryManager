@@ -1,12 +1,18 @@
 package dev.ayupi.pim.app
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.Alignment
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBarItem
@@ -50,15 +56,33 @@ fun PSEApp(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (showFab) {
-                FloatingActionButton(
-                    onClick = {
-                        appState.navController.navigateToItemEntry()
-                    }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.End
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Eintrag hinzufügen"
-                    )
+                    SmallFloatingActionButton(
+                        onClick = {
+                            appState.navController.navigateToItemEntry(triggerScan = true)
+                        },
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.QrCodeScanner,
+                            contentDescription = "Mit Barcode scannen"
+                        )
+                    }
+
+                    FloatingActionButton(
+                        onClick = {
+                            appState.navController.navigateToItemEntry()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Eintrag hinzufügen"
+                        )
+                    }
                 }
             }
         },

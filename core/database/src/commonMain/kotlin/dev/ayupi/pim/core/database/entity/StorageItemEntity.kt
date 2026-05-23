@@ -28,8 +28,6 @@ data class StorageItemEntity(
     val storageId: Uuid,
     val itemId: Uuid,
     val quantity: Long,
-    val itemSize: Int,
-    val unit: String,
     @SerialName("expiration_date")
     val expirationDate: LocalDate?,
 

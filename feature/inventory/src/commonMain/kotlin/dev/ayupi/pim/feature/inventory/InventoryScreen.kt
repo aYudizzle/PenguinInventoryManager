@@ -19,8 +19,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,7 +36,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -64,7 +75,8 @@ fun InventoryScreen(
         onItemClick = onItemClick,
         onStorageFilterSelected = viewModel::onStorageFilterSelected,
         onSearchQueryChange = viewModel::onSearchQueryChange,
-        onToggleWarnings = viewModel::onToggleWarningFilter
+        onToggleWarnings = viewModel::onToggleWarningFilter,
+        onDeleteItem = viewModel::onDeleteItem
     )
 }
 
@@ -75,7 +87,8 @@ fun InventoryContent(
     onStorageFilterSelected: (String?) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onItemClick: (String) -> Unit,
-    onToggleWarnings: (Boolean) -> Unit
+    onToggleWarnings: (Boolean) -> Unit,
+    onDeleteItem: (String) -> Unit
 ) {
     when (state) {
         InventoryUiState.Loading -> {
@@ -99,12 +112,14 @@ fun InventoryContent(
                 onStorageFilterSelected = onStorageFilterSelected,
                 onSearchQueryChange = onSearchQueryChange,
                 onItemClick = onItemClick,
-                onToggleWarnings = onToggleWarnings
+                onToggleWarnings = onToggleWarnings,
+                onDeleteItem = onDeleteItem
             )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoadedContent(
     modifier: Modifier,
@@ -117,38 +132,89 @@ fun LoadedContent(
     onSearchQueryChange: (String) -> Unit,
     onItemClick: (String) -> Unit,
     onToggleWarnings: (Boolean) -> Unit,
+    onDeleteItem: (String) -> Unit,
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = CenterHorizontally
-    ) {
-        InventorySearchBar(
-            query = searchQuery,
-            onQueryChange = onSearchQueryChange
-        )
-        StorageFilterRow(
-            storages = storages,
-            selectedId = selectedStorageId,
-            onSelect = onStorageFilterSelected,
-            showOnlyWarnings = showOnlyWarnings,
-            onToggleWarnings = onToggleWarnings
-        )
-        if (items.isEmpty()) {
-            Text("Keine Produkte gefunden", color = Color.Gray)
-        } else {
-            LazyColumn(
-                contentPadding = PaddingValues(bottom = 80.dp), // Platz für FAB
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(items, key = { it.id }) { item ->
-                    StorageItemRow(
-                        item = item,
-                        onClick = { onItemClick(item.id) }
-                    )
+    var itemToDelete by remember { mutableStateOf<StorageItemUi?>(null) }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = CenterHorizontally
+        ) {
+            InventorySearchBar(
+                query = searchQuery,
+                onQueryChange = onSearchQueryChange
+            )
+            StorageFilterRow(
+                storages = storages,
+                selectedId = selectedStorageId,
+                onSelect = onStorageFilterSelected,
+                showOnlyWarnings = showOnlyWarnings,
+                onToggleWarnings = onToggleWarnings
+            )
+            if (items.isEmpty()) {
+                Text("Keine Produkte gefunden", color = Color.Gray)
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(bottom = 80.dp), // Platz für FAB
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(items, key = { it.id }) { item ->
+                        val dismissState = rememberSwipeToDismissBoxState()
+
+                        LaunchedEffect(dismissState.currentValue) {
+                            if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+                                itemToDelete = item
+                                dismissState.snapTo(SwipeToDismissBoxValue.Settled)
+                            }
+                        }
+
+                        SwipeToDismissBox(
+                            state = dismissState,
+                            backgroundContent = {
+                                val color = when (dismissState.dismissDirection) {
+                                    SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
+                                    else -> Color.Transparent
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(color)
+                                        .padding(horizontal = 16.dp),
+                                    contentAlignment = Alignment.CenterEnd
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Löschen",
+                                        tint = MaterialTheme.colorScheme.onError
+                                    )
+                                }
+                            },
+                            enableDismissFromStartToEnd = false,
+                            content = {
+                                StorageItemRow(
+                                    item = item,
+                                    onClick = { onItemClick(item.id) }
+                                )
+                            }
+                        )
+                    }
                 }
             }
+        }
+
+        itemToDelete?.let {
+            DeleteDialog(
+                onDismiss = { itemToDelete = null },
+                itemToDelete = it,
+                onDelete = {
+                    onDeleteItem(it.id)
+                    itemToDelete = null
+                }
+            )
         }
     }
 }
@@ -278,4 +344,21 @@ fun ShowWarningToggleChip(
             trailingIcon()
         }
     }
+}
+
+@Composable
+fun DeleteDialog(
+    onDismiss: () -> Unit,
+    itemToDelete: StorageItemUi,
+    onDelete: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("${itemToDelete.itemName} löschen?") },
+        text = { Text("Möchtest du ${itemToDelete.itemName} wirklich aus dem Bestand löschen?") },
+        confirmButton = {
+            TextButton(onClick = { onDelete() }) { Text("Löschen") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Abbrechen") } }
+    )
 }

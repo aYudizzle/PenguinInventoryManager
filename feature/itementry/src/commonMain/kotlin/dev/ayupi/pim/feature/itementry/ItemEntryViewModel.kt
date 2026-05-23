@@ -121,18 +121,40 @@ class ItemEntryViewModel(
         }
     }
 
-    private suspend fun fillFromExistingItem(item: Item) {
+    private fun fillFromExistingItem(item: Item) {
         val barcodeVal = item.barcode
         if (_formState.value.barcode.isBlank() && !barcodeVal.isNullOrBlank()) {
             _formState.update { it.copy(barcode = barcodeVal) }
         }
-        val latestStorageItem = repository.getLatestStorageItemByItemId(item.id)
-        if (latestStorageItem != null) {
+
+        // Hybride Logik: Erst schauen, ob das Item selbst bereits angepasste Werte hat (> 1 oder nicht g)
+        if (item.itemSize > 1 || item.unit != StorageUnit.GRAM) {
             _formState.update {
                 it.copy(
-                    size = latestStorageItem.itemSize.toString(),
-                    unit = latestStorageItem.unit
+                    size = item.itemSize.toString(),
+                    unit = item.unit
                 )
+            }
+        } else {
+            // Fallback: Datenbank nach dem neuesten StorageItem für dieses Produkt abfragen (auch gelöschte)
+            viewModelScope.launch {
+                val latestStorageItem = repository.getLatestStorageItemByItemId(item.id)
+                if (latestStorageItem != null) {
+                    _formState.update {
+                        it.copy(
+                            size = latestStorageItem.itemSize.toString(),
+                            unit = latestStorageItem.unit
+                        )
+                    }
+                } else {
+                    // Absoluter Fallback: Die Standardwerte des Items setzen
+                    _formState.update {
+                        it.copy(
+                            size = item.itemSize.toString(),
+                            unit = item.unit
+                        )
+                    }
+                }
             }
         }
     }

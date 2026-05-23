@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class InventoryViewModel(
     private val storageRepository: StorageRepository,
@@ -84,6 +85,12 @@ class InventoryViewModel(
 
     fun onToggleWarningFilter(active: Boolean) {
         _showOnlyWarnings.value = active
+    }
+
+    fun onDeleteItem(id: String) {
+        viewModelScope.launch {
+            storageRepository.deleteStorageItem(id)
+        }
     }
 }
 

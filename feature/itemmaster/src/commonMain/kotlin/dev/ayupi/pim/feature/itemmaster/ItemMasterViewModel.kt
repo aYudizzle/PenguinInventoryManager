@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+import dev.ayupi.pim.core.model.StorageUnit
+
 class ItemMasterViewModel(
     private val storageRepository: StorageRepository
 ): ViewModel() {
@@ -39,7 +41,7 @@ class ItemMasterViewModel(
     val deleteDialogState = _deleteDialogState.asStateFlow()
 
     fun onEditClick(item: Item) {
-        _dialogState.value = EditDialogState(item.id, item.name)
+        _dialogState.value = EditDialogState(item)
     }
 
     fun onDialogDismiss() {
@@ -61,15 +63,15 @@ class ItemMasterViewModel(
         _deleteDialogState.value = null
     }
 
-    fun onRenameConfirm(newName: String) {
+    fun onEditConfirm(newName: String, newBarcode: String?, newSize: Int, newUnit: StorageUnit) {
         val current = _dialogState.value ?: return
-        if(newName.isBlank() || newName == current.currentName) {
+        if(newName.isBlank()) {
             onDialogDismiss()
             return
         }
 
         val items = (uiState.value as? ItemMasterUiState.Success)?.items ?: emptyList()
-        val isDuplicate = items.any { it.name.equals(newName, ignoreCase = true) && it.id != current.itemId }
+        val isDuplicate = items.any { it.name.equals(newName, ignoreCase = true) && it.id != current.item.id }
 
         if(isDuplicate) {
             _dialogState.update {
@@ -78,7 +80,13 @@ class ItemMasterViewModel(
             return
         }
         viewModelScope.launch {
-            storageRepository.updateItemName(current.itemId, newName)
+            storageRepository.updateMasterItem(
+                id = current.item.id,
+                newName = newName,
+                barcode = newBarcode.takeIf { it?.isNotBlank() == true },
+                itemSize = newSize,
+                unit = newUnit
+            )
             onDialogDismiss()
         }
     }
@@ -91,8 +99,7 @@ sealed interface ItemMasterUiState {
 }
 
 data class EditDialogState(
-    val itemId: String,
-    val currentName: String,
+    val item: Item,
     val error: String? = null
 )
 

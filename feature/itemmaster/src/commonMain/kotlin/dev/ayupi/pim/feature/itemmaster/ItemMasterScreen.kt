@@ -38,6 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.ayupi.pim.core.model.Item
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.ui.text.input.KeyboardType
+import dev.ayupi.pim.core.model.StorageUnit
 
 @Composable
 fun ItemMasterScreen(
@@ -60,7 +67,7 @@ fun ItemMasterScreen(
         onDeleteDialogDismiss = viewModel::onDeleteDismiss,
         onEditClick = viewModel::onEditClick,
         onEditDialogDismiss = viewModel::onDialogDismiss,
-        onRenameConfirm = viewModel::onRenameConfirm,
+        onEditConfirm = viewModel::onEditConfirm,
         onDeleteConfirm = viewModel::onDeleteConfirm
     )
 }
@@ -76,7 +83,7 @@ fun ItemMasterContent(
     onDeleteClick: (Item) -> Unit,
     onDeleteDialogDismiss: () -> Unit,
     onDeleteConfirm: () -> Unit,
-    onRenameConfirm: (String) -> Unit,
+    onEditConfirm: (String, String?, Int, StorageUnit) -> Unit,
 ) {
     when(state) {
         ItemMasterUiState.Empty -> {
@@ -108,7 +115,7 @@ fun ItemMasterContent(
                 onDeleteConfirm = onDeleteConfirm,
                 dialogState = editDialogState,
                 deleteDialogState = deleteDialogState,
-                onRenameConfirm = onRenameConfirm
+                onEditConfirm = onEditConfirm
             )
         }
     }
@@ -124,7 +131,7 @@ fun LoadedContent(
     onDeleteConfirm: () -> Unit,
     onEditDialogDismiss: () -> Unit,
     dialogState: EditDialogState?,
-    onRenameConfirm: (String) -> Unit,
+    onEditConfirm: (String, String?, Int, StorageUnit) -> Unit,
     deleteDialogState: DeleteDialogState?
 ) {
     LazyColumn(
@@ -155,10 +162,10 @@ fun LoadedContent(
         }
     }
     dialogState?.let { dialogState ->
-        RenameItemDialog(
-            initialName = dialogState.currentName,
+        EditItemMasterDialog(
+            item = dialogState.item,
             onDismiss = onEditDialogDismiss,
-            onConfirm = onRenameConfirm,
+            onConfirm = onEditConfirm,
             error = dialogState.error
         )
     }
@@ -176,7 +183,7 @@ fun ItemMasterRow(item: Item, onEdit: () -> Unit, onDelete: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onEdit() } // Klick auf Zeile öffnet auch Edit? Oder nur Button?
+            .clickable { onEdit() }
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -185,12 +192,27 @@ fun ItemMasterRow(item: Item, onEdit: () -> Unit, onDelete: () -> Unit) {
                 text = item.name,
                 style = MaterialTheme.typography.bodyLarge
             )
-            if (!item.barcode.isNullOrBlank()) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "Barcode: ${item.barcode}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline
+                    text = "${item.itemSize} ${item.unit.abbreviation}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                if (!item.barcode.isNullOrBlank()) {
+                    Text(
+                        text = "•",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Text(
+                        text = "Barcode: ${item.barcode}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
             }
         }
 
@@ -201,43 +223,89 @@ fun ItemMasterRow(item: Item, onEdit: () -> Unit, onDelete: () -> Unit) {
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = "Löschen",
-                tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f) // Leicht abgeschwächt
+                tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
             )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RenameItemDialog(
-    initialName: String,
+fun EditItemMasterDialog(
+    item: Item,
     onDismiss: () -> Unit,
     error: String? = null,
-    onConfirm: (String) -> Unit
+    onConfirm: (newName: String, newBarcode: String?, newSize: Int, newUnit: StorageUnit) -> Unit
 ) {
-    var text by remember { mutableStateOf(initialName) }
+    var name by remember { mutableStateOf(item.name) }
+    var barcode by remember { mutableStateOf(item.barcode ?: "") }
+    var size by remember { mutableStateOf(item.itemSize.toString()) }
+    var unit by remember { mutableStateOf(item.unit) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Produkt umbenennen") },
+        title = { Text("Produkt bearbeiten") },
         text = {
-            Column {
-                Text("Ändere den Namen für alle Lagerorte.")
-                Spacer(Modifier.height(16.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text("Ändere die Stammdaten des Produkts. Die Änderungen gelten für alle Lagerorte.")
+
                 OutlinedTextField(
-                    value = text,
-                    onValueChange = { text = it },
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Produktname") },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    supportingText = {
-                        error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                    }
+                    modifier = Modifier.fillMaxWidth()
                 )
+
+                OutlinedTextField(
+                    value = barcode,
+                    onValueChange = { barcode = it },
+                    label = { Text("Barcode (Optional)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = size,
+                    onValueChange = { input ->
+                        if (input.all { it.isDigit() }) {
+                            size = input
+                        }
+                    },
+                    label = { Text("Packungsgröße") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Einheit", style = MaterialTheme.typography.labelMedium)
+                    SingleChoiceSegmentedButtonRow(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        StorageUnit.entries.forEachIndexed { index, storageUnit ->
+                            SegmentedButton(
+                                selected = storageUnit == unit,
+                                onClick = { unit = storageUnit },
+                                label = { Text(text = storageUnit.abbreviation) },
+                                shape = SegmentedButtonDefaults.itemShape(index, StorageUnit.entries.size)
+                            )
+                        }
+                    }
+                }
+
+                error?.let {
+                    Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                }
             }
         },
         confirmButton = {
             TextButton(
-                onClick = { onConfirm(text) },
-                enabled = text.isNotBlank()
+                onClick = {
+                    val finalSize = size.toIntOrNull() ?: 1
+                    onConfirm(name, barcode.takeIf { it.isNotBlank() }, finalSize, unit)
+                },
+                enabled = name.isNotBlank() && size.toIntOrNull() != null
             ) {
                 Text("Speichern")
             }
@@ -260,7 +328,7 @@ fun DeleteItemDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Produkt umbenennen") },
+        title = { Text("Produkt löschen") },
         text = {
             Column {
                 Text("Möchtest du '$itemName' wirklich löschen?")
@@ -277,7 +345,7 @@ fun DeleteItemDialog(
                 onClick = { onConfirm() },
                 enabled = text.isNotBlank()
             ) {
-                Text("Speichern")
+                Text("Löschen")
             }
         },
         dismissButton = {

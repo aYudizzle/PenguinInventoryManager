@@ -10,10 +10,10 @@ import dev.ayupi.pim.feature.itementry.ItemEntryScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ItemEntryRoute(val itemId: String?)
+data class ItemEntryRoute(val itemId: String? = null, val triggerScan: Boolean = false)
 
-fun NavController.navigateToItemEntry(itemId: String? = null, navOptions: NavOptions? = null) =
-    navigate(route = ItemEntryRoute(itemId = itemId), navOptions = navOptions)
+fun NavController.navigateToItemEntry(itemId: String? = null, triggerScan: Boolean = false, navOptions: NavOptions? = null) =
+    navigate(route = ItemEntryRoute(itemId = itemId, triggerScan = triggerScan), navOptions = navOptions)
 
 fun NavGraphBuilder.itemEntryScreen(
     modifier: Modifier = Modifier,
@@ -25,6 +25,7 @@ fun NavGraphBuilder.itemEntryScreen(
         ItemEntryScreen(
             modifier = modifier,
             itemId = args.itemId,
+            triggerScan = args.triggerScan,
             onShowSnackbar = onShowSnackbar,
             onNavigateBack = onNavigateBack,
         )

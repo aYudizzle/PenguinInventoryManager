@@ -21,7 +21,7 @@ import dev.ayupi.pim.core.database.entity.StorageItemEntity
         StorageEntity::class,
         StorageItemEntity::class
     ],
-    version = 3,
+    version = 5,
 )
 @TypeConverters(
     UuidConverter::class,

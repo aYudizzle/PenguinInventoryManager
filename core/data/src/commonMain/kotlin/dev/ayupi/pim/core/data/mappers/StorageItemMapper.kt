@@ -27,8 +27,8 @@ fun StorageItemWithDetails.toDto(): StorageItemDto {
 
         quantityInfo = NestedQuantity(
             count = this.entry.quantity,
-            unit = this.entry.unit,
-            sizePerUnit = this.entry.itemSize,
+            unit = this.item.unit,
+            sizePerUnit = this.item.itemSize,
         ),
 
         expirationDate = this.entry.expirationDate,
@@ -49,6 +49,8 @@ fun StorageItemWithDetails.toDomain(): StorageItem {
             id = this.item.id.toString(),
             name = this.item.name,
             barcode = this.item.barcode,
+            itemSize = this.item.itemSize,
+            unit = StorageUnit.fromString(this.item.unit),
             updatedAt = this.item.updatedAt,
             createdAt = this.item.createdAt,
         ),
@@ -59,9 +61,7 @@ fun StorageItemWithDetails.toDomain(): StorageItem {
             updatedAt = this.storage.updatedAt,
             createdAt = this.storage.createdAt,
         ),
-        itemSize = this.entry.itemSize,
         quantity = this.entry.quantity,
-        unit = StorageUnit.fromString(this.entry.unit),
         expirationDate = this.entry.expirationDate,
 
         // Domain-spezifische Zeitstempel

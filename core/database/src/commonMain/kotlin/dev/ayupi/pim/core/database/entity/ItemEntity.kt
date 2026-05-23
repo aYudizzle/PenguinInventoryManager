@@ -10,6 +10,8 @@ data class ItemEntity (
     @PrimaryKey(autoGenerate = false) val id: Uuid = Uuid.random(),
     val name: String,
     val barcode: String? = null,
+    val itemSize: Int = 1,
+    val unit: String = "g",
 
     // # Sync Fields
     val createdAt: Instant,

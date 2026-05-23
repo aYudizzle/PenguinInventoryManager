@@ -28,6 +28,13 @@ interface StorageRepository {
     fun getItems(): Flow<List<Item>>
 
     suspend fun updateItemName(id: String, newName: String)
+    suspend fun updateMasterItem(
+        id: String,
+        newName: String,
+        barcode: String?,
+        itemSize: Int,
+        unit: StorageUnit
+    )
 
     suspend fun refresh()
 

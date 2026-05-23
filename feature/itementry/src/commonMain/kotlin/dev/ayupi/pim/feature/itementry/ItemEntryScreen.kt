@@ -76,6 +76,7 @@ fun ItemEntryScreen(
     modifier: Modifier,
     onShowSnackbar: suspend (String, String?) -> Boolean,
     onNavigateBack: () -> Unit,
+    triggerScan: Boolean = false,
 ) {
     val viewModel: ItemEntryViewModel = koinViewModel<ItemEntryViewModel>(parameters = { parametersOf(itemId) })
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -105,6 +106,7 @@ fun ItemEntryScreen(
         onExpirationDateChange = viewModel::onExpirationDateChange,
         onSave = viewModel::onSave,
         onShowSnackbar = onShowSnackbar,
+        triggerScan = triggerScan,
     )
 
 
@@ -124,7 +126,8 @@ fun ItemEntryContent(
     onStorageChange: (String) -> Unit,
     onExpirationDateChange: (LocalDate?) -> Unit,
     onSave: () -> Unit,
-    onShowSnackbar: suspend (String, String?) -> Boolean
+    onShowSnackbar: suspend (String, String?) -> Boolean,
+    triggerScan: Boolean = false,
 ) {
     Scaffold(
         topBar = {
@@ -158,6 +161,7 @@ fun ItemEntryContent(
                         onExpirationDateChange = onExpirationDateChange,
                         onStorageChange = onStorageChange,
                         onSave = onSave,
+                        triggerScan = triggerScan,
                     )
                 }
             }
@@ -179,7 +183,8 @@ fun ItemEntryFormContent(
     onUnitChange: (StorageUnit) -> Unit,
     onStorageChange: (String) -> Unit,
     onExpirationDateChange: (LocalDate?) -> Unit,
-    onSave: () -> Unit
+    onSave: () -> Unit,
+    triggerScan: Boolean = false,
 ) {
     var storageDropdownExpanded by remember { mutableStateOf(false) }
     var itemDropdownExpanded by remember { mutableStateOf(false) }
@@ -210,7 +215,8 @@ fun ItemEntryFormContent(
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     BarcodeScannerButton(
-                        onBarcodeScanned = onBarcodeChange
+                        onBarcodeScanned = onBarcodeChange,
+                        autoTrigger = triggerScan
                     )
                 },
                 keyboardOptions = KeyboardOptions(
