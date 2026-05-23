@@ -17,5 +17,8 @@ kotlin {
             implementation(compose.material3)
             implementation(libs.kotlinx.datetime)
         }
+        androidMain.dependencies {
+            implementation(libs.play.services.code.scanner)
+        }
     }
 }

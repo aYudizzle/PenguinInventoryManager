@@ -62,6 +62,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.ayupi.pim.core.model.Item
 import dev.ayupi.pim.core.model.Storage
 import dev.ayupi.pim.core.model.StorageUnit
+import dev.ayupi.pim.core.ui.components.BarcodeScannerButton
 import dev.ayupi.pim.core.ui.components.MyDatePickerDialog
 import kotlinx.datetime.LocalDate
 import org.koin.compose.viewmodel.koinViewModel
@@ -96,6 +97,7 @@ fun ItemEntryScreen(
         onNavigateBack = onNavigateBack,
         onNameChange = viewModel::onNameChange,
         onNameSelected = viewModel::onNameSelected,
+        onBarcodeChange = viewModel::onBarcodeChange,
         onQuantityChange = viewModel::onQuantityChange,
         onUnitChange = viewModel::onUnitChange,
         onSizeChange = viewModel::onSizeChange,
@@ -115,6 +117,7 @@ fun ItemEntryContent(
     onNavigateBack: () -> Unit,
     onNameChange: (TextFieldValue) -> Unit,
     onNameSelected: (String) -> Unit,
+    onBarcodeChange: (String) -> Unit,
     onQuantityChange: (String) -> Unit,
     onSizeChange: (String) -> Unit,
     onUnitChange: (StorageUnit) -> Unit,
@@ -148,6 +151,7 @@ fun ItemEntryContent(
                         items = state.filteredItems,
                         onNameChange = onNameChange,
                         onNameSelected = onNameSelected,
+                        onBarcodeChange = onBarcodeChange,
                         onQuantityChange = onQuantityChange,
                         onUnitChange = onUnitChange,
                         onSizeChange = onSizeChange,
@@ -169,6 +173,7 @@ fun ItemEntryFormContent(
     storages: List<Storage>,
     onNameChange: (TextFieldValue) -> Unit,
     onNameSelected: (String) -> Unit,
+    onBarcodeChange: (String) -> Unit,
     onQuantityChange: (String) -> Unit,
     onSizeChange: (String) -> Unit,
     onUnitChange: (StorageUnit) -> Unit,
@@ -193,6 +198,28 @@ fun ItemEntryFormContent(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(20.dp) // Luft zwischen Elementen
     ) {
+
+        // 0. Barcode Field (Optional)
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Barcode (Optional)", style = MaterialTheme.typography.labelLarge)
+
+            OutlinedTextField(
+                value = form.barcode,
+                onValueChange = onBarcodeChange,
+                placeholder = { Text("Scannen oder eingeben") },
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    BarcodeScannerButton(
+                        onBarcodeScanned = onBarcodeChange
+                    )
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next,
+                    keyboardType = KeyboardType.Number
+                ),
+                singleLine = true
+            )
+        }
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Produktname", style = MaterialTheme.typography.labelLarge)

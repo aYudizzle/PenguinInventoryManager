@@ -16,7 +16,8 @@ fun StorageItemWithDetails.toDto(): StorageItemDto {
 
         item = NestedItem(
             id = this.item.id.toString(),
-            name = this.item.name
+            name = this.item.name,
+            barcode = this.item.barcode
         ),
 
         storage = NestedStorage(
@@ -47,6 +48,7 @@ fun StorageItemWithDetails.toDomain(): StorageItem {
         item = Item(
             id = this.item.id.toString(),
             name = this.item.name,
+            barcode = this.item.barcode,
             updatedAt = this.item.updatedAt,
             createdAt = this.item.createdAt,
         ),

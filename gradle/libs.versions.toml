@@ -30,10 +30,12 @@ okio = "3.16.4"
 connectivity = "2.3.0"
 konnectivity = "0.1-alpha01"
 konfig = "0.17.1"
+playServicesCodeScanner = "16.1.0"
 
 
 
 [libraries]
+play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "playServicesCodeScanner" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }

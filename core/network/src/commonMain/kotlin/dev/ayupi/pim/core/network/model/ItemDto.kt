@@ -8,6 +8,7 @@ import kotlin.time.Instant
 data class ItemDto(
     val id: String,
     val name: String,
+    val barcode: String? = null,
     @SerialName("created_at") val createdAt: Instant,
     @SerialName("updated_at") val updatedAt: Instant,
     @SerialName("deleted_at") val deletedAt: Instant? = null

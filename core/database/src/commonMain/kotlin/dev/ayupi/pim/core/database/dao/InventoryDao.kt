@@ -28,6 +28,15 @@ interface InventoryDao : BaseSyncDao<StorageItemEntity> {
     @Query("SELECT * FROM storage_items WHERE id = :id")
     fun getByIdWithDetails(id: Uuid): Flow<StorageItemWithDetails?>
 
+    @Transaction
+    @Query("""
+        SELECT * FROM storage_items 
+        WHERE itemId = :itemId 
+        ORDER BY updatedAt DESC 
+        LIMIT 1
+    """)
+    suspend fun getLatestByItemId(itemId: Uuid): StorageItemWithDetails?
+
     @Query("SELECT * FROM storage_items WHERE id = :id")
     suspend fun getEntryById(id: Uuid): StorageItemEntity?
 

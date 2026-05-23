@@ -8,6 +8,7 @@ fun ItemEntity.toDto() =
     ItemDto(
         id = id.toString(),
         name = name,
+        barcode = barcode,
         createdAt = createdAt,
         updatedAt = updatedAt,
         deletedAt = deletedAt
@@ -16,6 +17,7 @@ fun ItemEntity.toDto() =
 fun ItemEntity.toDomain() = Item(
     id = id.toString(),
     name = name,
+    barcode = barcode,
     updatedAt = updatedAt,
     createdAt = createdAt,
 )

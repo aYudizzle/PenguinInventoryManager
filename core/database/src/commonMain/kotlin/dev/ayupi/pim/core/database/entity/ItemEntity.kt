@@ -9,6 +9,7 @@ import kotlin.uuid.Uuid
 data class ItemEntity (
     @PrimaryKey(autoGenerate = false) val id: Uuid = Uuid.random(),
     val name: String,
+    val barcode: String? = null,
 
     // # Sync Fields
     val createdAt: Instant,

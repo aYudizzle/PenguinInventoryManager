@@ -90,6 +90,51 @@ class ItemEntryViewModel(
                 )
             )
         }
+        viewModelScope.launch {
+            val availableItems = repository.getItems().first()
+            val existingItem = availableItems.firstOrNull { it.name.equals(selectedName, ignoreCase = true) }
+            if (existingItem != null) {
+                fillFromExistingItem(existingItem)
+            }
+        }
+    }
+
+    fun onBarcodeChange(barcode: String) {
+        val trimmed = barcode.trim()
+        _formState.update { it.copy(barcode = trimmed) }
+        if (trimmed.isBlank()) return
+
+        viewModelScope.launch {
+            val availableItems = repository.getItems().first()
+            val existingItem = availableItems.firstOrNull { it.barcode?.trim() == trimmed }
+            if (existingItem != null) {
+                _formState.update {
+                    it.copy(
+                        name = TextFieldValue(
+                            text = existingItem.name,
+                            selection = TextRange(existingItem.name.length)
+                        )
+                    )
+                }
+                fillFromExistingItem(existingItem)
+            }
+        }
+    }
+
+    private suspend fun fillFromExistingItem(item: Item) {
+        val barcodeVal = item.barcode
+        if (_formState.value.barcode.isBlank() && !barcodeVal.isNullOrBlank()) {
+            _formState.update { it.copy(barcode = barcodeVal) }
+        }
+        val latestStorageItem = repository.getLatestStorageItemByItemId(item.id)
+        if (latestStorageItem != null) {
+            _formState.update {
+                it.copy(
+                    size = latestStorageItem.itemSize.toString(),
+                    unit = latestStorageItem.unit
+                )
+            }
+        }
     }
 
     fun onQuantityChange(input: String) {
@@ -155,6 +200,7 @@ class ItemEntryViewModel(
                     existingInventoryId = form.entryId,
                     itemId = availableItems.firstOrNull { it.name == form.name.text }?.id,
                     itemName = form.name.text,
+                    barcode = form.barcode.takeIf { it.isNotBlank() },
                     storageId = form.selectedStorageId!!,
                     quantity = quantity!!,
                     itemSize = size!!,
@@ -174,6 +220,7 @@ class ItemEntryViewModel(
         ItemFormState(
             entryId = item.id,
             name = TextFieldValue(text=item.item.name),
+            barcode = item.item.barcode ?: "",
             quantity = item.quantity.toString(),
             size = item.itemSize.toString(),
             unit = item.unit,
@@ -196,6 +243,7 @@ data class ItemFormState(
     val entryId: String? = null, // null = Create Mode
     val name: TextFieldValue = TextFieldValue(), // TextfieldValue - cursor position
     val nameError: String? = null,
+    val barcode: String = "",
     val quantity: String = "",
     val quantityError: String? = null,
     val size: String = "",

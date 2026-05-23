@@ -129,7 +129,12 @@ class OfflineFirstSyncManager(
     // ========================================================================
 
     private suspend fun pullRemoteChanges() {
-        val lastSync = userDataRepository.data.first().lastSyncTimestamp
+        val hasLocalData = storageDao.getAll().first().isNotEmpty() || itemDao.getItems().first().isNotEmpty()
+        val lastSync = if (hasLocalData) {
+            userDataRepository.data.first().lastSyncTimestamp
+        } else {
+            Instant.DISTANT_PAST
+        }
         // A. Storages
         pullDataGeneric(
             lastSync = lastSync,
@@ -204,6 +209,7 @@ class OfflineFirstSyncManager(
             itemDao.upsert(ItemEntity(
                 id = id,
                 name = dto.name,
+                barcode = dto.barcode,
                 createdAt = dto.createdAt,
                 updatedAt = dto.updatedAt,
                 deletedAt = null,
@@ -225,6 +231,7 @@ class OfflineFirstSyncManager(
         val itemEntity = ItemEntity(
             id = Uuid.parse(dto.item.id),
             name = dto.item.name,
+            barcode = dto.item.barcode,
             updatedAt = dto.updatedAt,
             createdAt = dto.updatedAt,
             deletedAt = null,

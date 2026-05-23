@@ -56,6 +56,7 @@ class OfflineFirstStorageRepository(
         existingInventoryId: String?,
         itemId: String?,
         itemName: String,
+        barcode: String?,
         storageId: String,
         quantity: Long,
         itemSize: Int,
@@ -70,6 +71,7 @@ class OfflineFirstStorageRepository(
                     val newItemEntity = ItemEntity(
                         id = newUuid,
                         name = itemName,
+                        barcode = barcode,
                         createdAt = now,
                         updatedAt = now,
                         isDirty = true,
@@ -78,7 +80,12 @@ class OfflineFirstStorageRepository(
                     itemDao.upsert(newItemEntity)
                     newUuid
                 } else {
-                    Uuid.parse(itemId)
+                    val existingUuid = Uuid.parse(itemId)
+                    val existingItem = itemDao.getById(existingUuid)
+                    if (existingItem != null && existingItem.barcode != barcode) {
+                        itemDao.upsert(existingItem.copy(barcode = barcode, isDirty = true, updatedAt = now))
+                    }
+                    existingUuid
                 }
 
                 val inventoryId = existingInventoryId?.let { Uuid.parse(it) } ?: Uuid.random()
@@ -123,6 +130,15 @@ class OfflineFirstStorageRepository(
         )
 
         trySync()
+    }
+
+    override suspend fun getLatestStorageItemByItemId(itemId: String): StorageItem? {
+        return try {
+            val uuid = Uuid.parse(itemId)
+            inventoryDao.getLatestByItemId(uuid)?.toDomain()
+        } catch (e: Exception) {
+            null
+        }
     }
 
     override suspend fun updateItemName(id: String, newName: String) {

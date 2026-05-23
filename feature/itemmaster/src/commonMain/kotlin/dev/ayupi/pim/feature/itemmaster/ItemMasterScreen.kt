@@ -180,11 +180,19 @@ fun ItemMasterRow(item: Item, onEdit: () -> Unit, onDelete: () -> Unit) {
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = item.name,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = item.name,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            if (!item.barcode.isNullOrBlank()) {
+                Text(
+                    text = "Barcode: ${item.barcode}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+        }
 
         IconButton(onClick = onEdit) {
             Icon(Icons.Default.Edit, contentDescription = "Bearbeiten", tint = MaterialTheme.colorScheme.primary)
