@@ -40,32 +40,32 @@ val outlineLight = Color(0xFF707974)
 val outlineVariantLight = Color(0xFFBFC9C2)
 
 // --- DARK THEME ---
-val primaryDark = Color(0xFF6DDBB2)
-val onPrimaryDark = Color(0xFF003829)
-val primaryContainerDark = Color(0xFF00513C)
-val onPrimaryContainerDark = Color(0xFF8AF8CD)
+val primaryDark = Color(0xFF80D8FF) // Eis-Blau / Iceberg Cyan
+val onPrimaryDark = Color(0xFF00344D) // Tiefblau / Abyssal Blue
+val primaryContainerDark = Color(0xFF004B6E) // Dunkles Meer / Cold Depth
+val onPrimaryContainerDark = Color(0xFFB3E5FC) // Helles Polar-Blau
 
-val secondaryDark = Color(0xFFB2CCBE)
-val onSecondaryDark = Color(0xFF1E352C)
-val secondaryContainerDark = Color(0xFF354B41)
-val onSecondaryContainerDark = Color(0xFFCEE9DB)
+val secondaryDark = Color(0xFFB0BEC5) // Gletscher-Grau / Ice Shelf
+val onSecondaryDark = Color(0xFF1C2833) // Dunkles Schiefergrau
+val secondaryContainerDark = Color(0xFF37474F) // Frosted Stone
+val onSecondaryContainerDark = Color(0xFFECEFF1) // Schnee-Weiß
 
-val tertiaryDark = Color(0xFFA6CCDE)
-val onTertiaryDark = Color(0xFF083543)
-val tertiaryContainerDark = Color(0xFF254B5A)
-val onTertiaryContainerDark = Color(0xFFC2E8FB)
+val tertiaryDark = Color(0xFFA7FFEB) // Polarlicht-Mint / Aurora Green
+val onTertiaryDark = Color(0xFF00372D) // Tiefes Tannen-Grün
+val tertiaryContainerDark = Color(0xFF005043) // Gletscher-Mint
+val onTertiaryContainerDark = Color(0xFFC8E6C9)
 
 val errorDark = Color(0xFFFFB4AB)
 val onErrorDark = Color(0xFF690005)
 val errorContainerDark = Color(0xFF93000A)
 val onErrorContainerDark = Color(0xFFFFDAD6)
 
-val backgroundDark = Color(0xFF0F1512)
-val onBackgroundDark = Color(0xFFDEE4DF)
-val surfaceDark = Color(0xFF0F1512)
-val onSurfaceDark = Color(0xFFDEE4DF)
+val backgroundDark = Color(0xFF0B121F) // Deep Polar Ocean
+val onBackgroundDark = Color(0xFFECEFF1) // Bright Polar White
+val surfaceDark = Color(0xFF131B2A) // Glacier Slate
+val onSurfaceDark = Color(0xFFECEFF1)
 
-val surfaceVariantDark = Color(0xFF404944)
-val onSurfaceVariantDark = Color(0xFFBFC9C2)
-val outlineDark = Color(0xFF8A938D)
-val outlineVariantDark = Color(0xFF404944)
+val surfaceVariantDark = Color(0xFF202D42) // Dark Ice Variant
+val onSurfaceVariantDark = Color(0xFFB0BEC5)
+val outlineDark = Color(0xFF78909C)
+val outlineVariantDark = Color(0xFF37474F)

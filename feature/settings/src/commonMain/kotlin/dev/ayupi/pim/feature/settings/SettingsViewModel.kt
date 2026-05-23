@@ -6,10 +6,10 @@ import dev.ayupi.pim.core.data.repository.UserDataRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -23,8 +23,11 @@ class SettingsViewModel(
         val initialUserData = userDataRepository.data.first()
         _expirationDaysInput.value = initialUserData.expirationWarningDays.toString()
         emitAll(
-            _expirationDaysInput.map { input ->
-                SettingsUiState.Success(expirationDaysInput = input)
+            combine(_expirationDaysInput, userDataRepository.data) { input, userData ->
+                SettingsUiState.Success(
+                    expirationDaysInput = input,
+                    isDarkMode = userData.isDarkMode
+                )
             }
         )
     }.stateIn(
@@ -44,9 +47,18 @@ class SettingsViewModel(
             }
         }
     }
+
+    fun onToggleDarkMode(active: Boolean) {
+        viewModelScope.launch {
+            userDataRepository.isDarkModeEnabled(active)
+        }
+    }
 }
 
 sealed interface SettingsUiState {
     data object Loading : SettingsUiState
-    data class Success(val expirationDaysInput: String) : SettingsUiState
+    data class Success(
+        val expirationDaysInput: String,
+        val isDarkMode: Boolean
+    ) : SettingsUiState
 }

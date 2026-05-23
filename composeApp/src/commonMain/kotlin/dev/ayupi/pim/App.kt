@@ -1,5 +1,6 @@
 package dev.ayupi.pim
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -34,6 +35,11 @@ fun App() {
         is AppUiState.Success -> (uiState as AppUiState.Success).data.lastSyncTimestamp.toRelativeTime()
     }
 
+    val darkTheme = when(val state = uiState) {
+        AppUiState.Loading -> isSystemInDarkTheme()
+        is AppUiState.Success -> state.data.isDarkMode
+    }
+
     LaunchedEffect(Unit) {
         appState.isOnline.collect { isOnline ->
             if(isOnline) {
@@ -43,7 +49,7 @@ fun App() {
     }
 
     PSEAppTheme(
-        darkTheme = false
+        darkTheme = darkTheme
     ) {
         PSEApp(
             appState,

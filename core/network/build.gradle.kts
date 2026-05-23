@@ -13,7 +13,6 @@ buildkonfig {
 
     val apiKey: String = gradleLocalProperties(rootDir, providers).getProperty("API_KEY", "")
     val baseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("API_URL", "localhost")
-
     defaultConfigs {
         buildConfigField(STRING, "API_BASE_URL", baseUrl)
         buildConfigField(STRING, "API_KEY", apiKey)

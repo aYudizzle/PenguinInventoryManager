@@ -10,12 +10,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +41,7 @@ fun SettingsScreen(
         modifier = modifier,
         state = userData,
         onWarningDaysChange = viewModel::onWarningDaysChange,
+        onToggleDarkMode = viewModel::onToggleDarkMode,
         onNavigateToItemMaster = onNavigateToItemMaster,
     )
 }
@@ -47,6 +51,7 @@ fun SettingsContent(
     modifier: Modifier,
     state: SettingsUiState,
     onWarningDaysChange: (String) -> Unit,
+    onToggleDarkMode: (Boolean) -> Unit,
     onNavigateToItemMaster: () -> Unit = {}
 ) {
 
@@ -68,6 +73,30 @@ fun SettingsContent(
                     label = { Text("Tage") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
+                )
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+                // Sektion: Darstellung
+                Text("Darstellung", style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(8.dp))
+
+                ListItem(
+                    headlineContent = { Text("Dunkles Design") },
+                    supportingContent = { Text("App-Farben abdunkeln") },
+                    leadingContent = {
+                        Icon(
+                            imageVector = if (state.isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
+                            contentDescription = null
+                        )
+                    },
+                    trailingContent = {
+                        Switch(
+                            checked = state.isDarkMode,
+                            onCheckedChange = { onToggleDarkMode(it) }
+                        )
+                    },
+                    modifier = Modifier.clip(RoundedCornerShape(12.dp))
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
