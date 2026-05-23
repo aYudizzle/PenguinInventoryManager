@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -32,6 +33,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import dev.ayupi.pim.feature.itementry.navigation.navigateToItemEntry
+import dev.ayupi.pim.feature.itemconsume.navigateToItemConsume
 import dev.ayupi.pim.navigation.NavigationDestination
 import dev.ayupi.pim.navigation.PSENavHost
 import org.jetbrains.compose.resources.stringResource
@@ -60,6 +62,19 @@ fun PSEApp(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.End
                 ) {
+                    SmallFloatingActionButton(
+                        onClick = {
+                            appState.navController.navigateToItemConsume()
+                        },
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Remove,
+                            contentDescription = "Entnehmen"
+                        )
+                    }
+
                     SmallFloatingActionButton(
                         onClick = {
                             appState.navController.navigateToItemEntry(triggerScan = true)

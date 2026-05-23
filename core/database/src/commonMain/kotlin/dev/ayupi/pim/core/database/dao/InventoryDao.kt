@@ -37,6 +37,14 @@ interface InventoryDao : BaseSyncDao<StorageItemEntity> {
     """)
     suspend fun getLatestByItemId(itemId: Uuid): StorageItemWithDetails?
 
+    @Transaction
+    @Query("""
+        SELECT si.* FROM storage_items si
+        INNER JOIN items i ON si.itemId = i.id
+        WHERE i.barcode = :barcode AND si.isDeleted = 0
+    """)
+    suspend fun getItemsByBarcode(barcode: String): List<StorageItemWithDetails>
+
     @Query("SELECT * FROM storage_items WHERE id = :id")
     suspend fun getEntryById(id: Uuid): StorageItemEntity?
 

@@ -51,6 +51,8 @@ interface StorageRepository {
     )
 
     suspend fun deleteStorageItem(id: String)
+    suspend fun getStorageItemsByBarcode(barcode: String): List<StorageItem>
+    suspend fun consumeStorageItem(id: String, quantity: Long)
     suspend fun getLatestStorageItemByItemId(itemId: String): StorageItem?
     fun getItemsInStorage(storageId: String): Flow<List<StorageItem>>
     fun getStorageById(storageId: String): Flow<Storage?>

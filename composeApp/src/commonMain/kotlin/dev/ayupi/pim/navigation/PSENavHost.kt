@@ -16,6 +16,7 @@ import dev.ayupi.pim.feature.settings.navigation.settingsScreen
 import dev.ayupi.pim.feature.storagedetails.navigation.navigateToStorageDetails
 import dev.ayupi.pim.feature.storagedetails.navigation.storageDetailsScreen
 import dev.ayupi.pim.feature.storageoverview.navigation.storageOverviewScreen
+import dev.ayupi.pim.feature.itemconsume.itemConsumeScreen
 
 @Composable
 fun PSENavHost(
@@ -43,6 +44,10 @@ fun PSENavHost(
         itemEntryScreen(
             modifier = Modifier.padding(paddingValues),
             onShowSnackbar = onShowSnackbar,
+            onNavigateBack = navController::navigateUp,
+        )
+        itemConsumeScreen(
+            modifier = Modifier.padding(paddingValues),
             onNavigateBack = navController::navigateUp,
         )
         settingsScreen(

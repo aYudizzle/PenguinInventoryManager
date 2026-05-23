@@ -276,6 +276,28 @@ class OfflineFirstStorageRepository(
         trySync()
     }
 
+    override suspend fun getStorageItemsByBarcode(barcode: String): List<StorageItem> {
+        return inventoryDao.getItemsByBarcode(barcode).map { it.toDomain() }
+    }
+
+    override suspend fun consumeStorageItem(id: String, quantity: Long) {
+        val uuid = Uuid.parse(id)
+        val now = Clock.System.now()
+        val existing = inventoryDao.getEntryById(uuid) ?: return
+
+        if (existing.quantity <= quantity) {
+            inventoryDao.softDelete(uuid, now)
+        } else {
+            val updated = existing.copy(
+                quantity = existing.quantity - quantity,
+                updatedAt = now,
+                isDirty = true
+            )
+            inventoryDao.upsert(updated)
+        }
+        trySync()
+    }
+
     private suspend fun trySync() {
         try {
             syncManager.triggerSync()

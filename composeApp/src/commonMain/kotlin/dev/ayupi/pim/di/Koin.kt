@@ -2,6 +2,7 @@ package dev.ayupi.pim.di
 
 import dev.ayupi.pim.core.data.di.dataModule
 import dev.ayupi.pim.feature.inventory.di.inventoryModule
+import dev.ayupi.pim.feature.itemconsume.di.itemConsumeModule
 import dev.ayupi.pim.feature.itementry.di.itemEntryModule
 import dev.ayupi.pim.feature.itemmaster.di.itemMasterModule
 import dev.ayupi.pim.feature.settings.di.settingsModule
@@ -22,6 +23,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             dataModule,
             itemMasterModule,
             inventoryModule,
+            itemConsumeModule,
         )
     }
 }
