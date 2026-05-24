@@ -20,6 +20,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,6 +42,9 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,6 +59,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -94,6 +100,7 @@ fun ItemEntryScreen(
     }
 
     ItemEntryContent(
+        modifier = modifier,
         uiState = uiState,
         onNavigateBack = onNavigateBack,
         onNameChange = viewModel::onNameChange,
@@ -128,6 +135,7 @@ fun ItemEntryContent(
     onSave: () -> Unit,
     onShowSnackbar: suspend (String, String?) -> Boolean,
     triggerScan: Boolean = false,
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         topBar = {
@@ -186,7 +194,6 @@ fun ItemEntryFormContent(
     onSave: () -> Unit,
     triggerScan: Boolean = false,
 ) {
-    var storageDropdownExpanded by remember { mutableStateOf(false) }
     var itemDropdownExpanded by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -303,37 +310,23 @@ fun ItemEntryFormContent(
             }
         }
 
-        // 2. Schrank (Dropdown)
+        // 2. Schrank (Chips in horizontal scrollable Row)
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Schrank", style = MaterialTheme.typography.labelLarge)
-            val selectedStorageName = storages.find { it.id == form.selectedStorageId }?.name ?: "Schrank auswählen"
-
-            ExposedDropdownMenuBox(
-                expanded = storageDropdownExpanded,
-                onExpandedChange = { storageDropdownExpanded = it },
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
-                    value = selectedStorageName,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = storageDropdownExpanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
-                )
-                ExposedDropdownMenu(
-                    expanded = storageDropdownExpanded,
-                    onDismissRequest = { storageDropdownExpanded = false }
-                ) {
-                    storages.forEach { storage ->
-                        DropdownMenuItem(
-                            text = { Text(storage.name) },
-                            onClick = {
-                                onStorageChange(storage.id)
-                                storageDropdownExpanded = false
-                            }
-                        )
-                    }
+                storages.forEach { storage ->
+                    val isSelected = storage.id == form.selectedStorageId
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onStorageChange(storage.id) },
+                        label = { Text(storage.name) }
+                    )
                 }
             }
         }
@@ -348,9 +341,38 @@ fun ItemEntryFormContent(
                 onValueChange = onQuantityChange, // Aktualisiert quantityInput
                 label = { Text("Anzahl") },
                 placeholder = { Text("1") },
+                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.weight(1f),
-                singleLine = true
+                singleLine = true,
+                leadingIcon = {
+                    IconButton(
+                        onClick = {
+                            val current = form.quantity.toLongOrNull() ?: 1L
+                            if (current > 1) {
+                                onQuantityChange((current - 1).toString())
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Remove,
+                            contentDescription = "Reduzieren"
+                        )
+                    }
+                },
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            val current = form.quantity.toLongOrNull() ?: 1L
+                            onQuantityChange((current + 1).toString())
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Erhöhen"
+                        )
+                    }
+                }
             )
 
             // Logik: Größe nur anzeigen, wenn NICHT "Stück" gewählt ist

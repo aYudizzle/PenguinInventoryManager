@@ -48,6 +48,16 @@ interface InventoryDao : BaseSyncDao<StorageItemEntity> {
     @Query("SELECT * FROM storage_items WHERE id = :id")
     suspend fun getEntryById(id: Uuid): StorageItemEntity?
 
+    @Query("""
+        SELECT * FROM storage_items 
+        WHERE itemId = :itemId 
+          AND storageId = :storageId 
+          AND (expirationDate = :expirationDate OR (expirationDate IS NULL AND :expirationDate IS NULL))
+          AND isDeleted = 0
+        LIMIT 1
+    """)
+    suspend fun getEntryByItemAndStorageAndExpiration(itemId: Uuid, storageId: Uuid, expirationDate: kotlinx.datetime.LocalDate?): StorageItemEntity?
+
     // ========================================================================
     // SYNC SPECIFIC (Push/Clean/Delete)
     // ========================================================================

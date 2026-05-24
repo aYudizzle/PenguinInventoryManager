@@ -298,6 +298,75 @@ class OfflineFirstStorageRepository(
         trySync()
     }
 
+    override suspend fun relocateStorageItem(
+        sourceStorageItemId: String,
+        targetStorageId: String,
+        quantityToMove: Long
+    ) {
+        val sourceUuid = Uuid.parse(sourceStorageItemId)
+        val targetStorageUuid = Uuid.parse(targetStorageId)
+        val now = Clock.System.now()
+
+        try {
+            inventoryDao.transaction {
+                val sourceItem = inventoryDao.getEntryById(sourceUuid) ?: return@transaction
+                if (sourceItem.quantity < quantityToMove || quantityToMove <= 0) return@transaction
+
+                // 1. Decrement quantity at source
+                if (sourceItem.quantity == quantityToMove) {
+                    inventoryDao.softDelete(sourceUuid, now)
+                } else {
+                    inventoryDao.upsert(
+                        sourceItem.copy(
+                            quantity = sourceItem.quantity - quantityToMove,
+                            updatedAt = now,
+                            isDirty = true
+                        )
+                    )
+                }
+
+                // 2. Increment or add at target storage
+                val existingTargetItem = inventoryDao.getEntryByItemAndStorageAndExpiration(
+                    itemId = sourceItem.itemId,
+                    storageId = targetStorageUuid,
+                    expirationDate = sourceItem.expirationDate
+                )
+
+                if (existingTargetItem != null) {
+                    inventoryDao.upsert(
+                        existingTargetItem.copy(
+                            quantity = existingTargetItem.quantity + quantityToMove,
+                            updatedAt = now,
+                            isDirty = true,
+                            isDeleted = false,
+                            deletedAt = null
+                        )
+                    )
+                } else {
+                    inventoryDao.upsert(
+                        StorageItemEntity(
+                            id = Uuid.random(),
+                            itemId = sourceItem.itemId,
+                            storageId = targetStorageUuid,
+                            quantity = quantityToMove,
+                            expirationDate = sourceItem.expirationDate,
+                            createdAt = now,
+                            updatedAt = now,
+                            isDirty = true,
+                            isDeleted = false,
+                            deletedAt = null
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            println("Error during relocation: ${e.message}")
+            e.printStackTrace()
+        }
+
+        trySync()
+    }
+
     private suspend fun trySync() {
         try {
             syncManager.triggerSync()

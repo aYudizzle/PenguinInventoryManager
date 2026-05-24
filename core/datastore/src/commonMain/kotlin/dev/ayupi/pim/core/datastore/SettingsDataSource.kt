@@ -28,4 +28,10 @@ class SettingsDataSource(
             currentSettings.copy(expirationWarningDays = days)
         }
     }
+
+    suspend fun setLastSelectedStorageId(storageId: String?) {
+        dataStore.updateData { currentSettings ->
+            currentSettings.copy(lastSelectedStorageId = storageId)
+        }
+    }
 }

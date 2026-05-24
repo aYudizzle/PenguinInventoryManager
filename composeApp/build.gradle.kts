@@ -45,6 +45,7 @@ kotlin {
             implementation(projects.feature.itemmaster)
             implementation(projects.feature.inventory)
             implementation(projects.feature.itemconsume)
+            implementation(projects.feature.itemrelocate)
 
             implementation(projects.core.data)
             implementation(projects.core.model)

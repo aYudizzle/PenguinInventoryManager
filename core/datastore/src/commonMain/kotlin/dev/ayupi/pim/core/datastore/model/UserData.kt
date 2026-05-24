@@ -7,5 +7,6 @@ import kotlin.time.Instant
 data class UserData(
     val lastSyncTimestamp: Instant = Instant.DISTANT_PAST,
     val isDarkMode: Boolean = false,
-    val expirationWarningDays: Int = 10
+    val expirationWarningDays: Int = 10,
+    val lastSelectedStorageId: String? = null
 )

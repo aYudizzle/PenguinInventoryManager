@@ -5,6 +5,7 @@ import dev.ayupi.pim.feature.inventory.di.inventoryModule
 import dev.ayupi.pim.feature.itemconsume.di.itemConsumeModule
 import dev.ayupi.pim.feature.itementry.di.itemEntryModule
 import dev.ayupi.pim.feature.itemmaster.di.itemMasterModule
+import dev.ayupi.pim.feature.itemrelocate.di.itemRelocateModule
 import dev.ayupi.pim.feature.settings.di.settingsModule
 import dev.ayupi.pim.feature.storagedetails.di.storageDetailsModule
 import dev.ayupi.pim.feature.storageoverview.di.storageOverviewModule
@@ -24,6 +25,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             itemMasterModule,
             inventoryModule,
             itemConsumeModule,
+            itemRelocateModule,
         )
     }
 }

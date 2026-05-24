@@ -10,4 +10,5 @@ interface UserDataRepository {
     suspend fun onLastSyncUpdate(lastSync: Instant)
 
     suspend fun setExpirationWarningDays(days: Int)
+    suspend fun setLastSelectedStorageId(storageId: String?)
 }

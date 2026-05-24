@@ -6,5 +6,6 @@ import dev.ayupi.pim.core.model.UserData as DomainUserData
 fun UserData.toDomain() = DomainUserData(
     lastSyncTimestamp = lastSyncTimestamp,
     isDarkMode = isDarkMode,
-    expirationWarningDays = expirationWarningDays
+    expirationWarningDays = expirationWarningDays,
+    lastSelectedStorageId = lastSelectedStorageId
 )

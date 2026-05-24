@@ -9,6 +9,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -26,6 +27,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,8 +45,11 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import dev.ayupi.pim.feature.itementry.navigation.navigateToItemEntry
 import dev.ayupi.pim.feature.itemconsume.navigateToItemConsume
+import dev.ayupi.pim.feature.itemrelocate.navigateToItemRelocate
 import dev.ayupi.pim.navigation.NavigationDestination
 import dev.ayupi.pim.navigation.PSENavHost
+import dev.ayupi.pim.core.ui.components.SpeedDialFab
+import dev.ayupi.pim.core.ui.components.SpeedDialItem
 import org.jetbrains.compose.resources.stringResource
 import kotlin.reflect.KClass
 import kotlin.time.ExperimentalTime
@@ -54,53 +68,15 @@ fun PSEApp(
     val showFab =
         currentTopLevelDestination == NavigationDestination.ITEMS || currentTopLevelDestination == NavigationDestination.STORAGE || currentTopLevelDestination == NavigationDestination.DETAILS
 
+    var isFabExpanded by remember { mutableStateOf(false) }
+
+    LaunchedEffect(currentDestination) {
+        isFabExpanded = false
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            if (showFab) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    SmallFloatingActionButton(
-                        onClick = {
-                            appState.navController.navigateToItemConsume()
-                        },
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Remove,
-                            contentDescription = "Entnehmen"
-                        )
-                    }
 
-                    SmallFloatingActionButton(
-                        onClick = {
-                            appState.navController.navigateToItemEntry(triggerScan = true)
-                        },
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.QrCodeScanner,
-                            contentDescription = "Mit Barcode scannen"
-                        )
-                    }
-
-                    FloatingActionButton(
-                        onClick = {
-                            appState.navController.navigateToItemEntry()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Eintrag hinzufügen"
-                        )
-                    }
-                }
-            }
-        },
         topBar = {
             currentTopLevelDestination?.let {
                 TopAppBar(
@@ -151,18 +127,84 @@ fun PSEApp(
             }
         }
     ) { paddingValues ->
-        PSENavHost(
-            appState = appState,
-            paddingValues = paddingValues,
-            onShowSnackbar = { message, action ->
-                snackbarHostState.showSnackbar(
-                    message = message,
-                    actionLabel = action,
-                    duration = SnackbarDuration.Short
-                ) == SnackbarResult.ActionPerformed
+        Box(modifier = Modifier.fillMaxSize()) {
+            PSENavHost(
+                appState = appState,
+                paddingValues = paddingValues,
+                onShowSnackbar = { message, action ->
+                    snackbarHostState.showSnackbar(
+                        message = message,
+                        actionLabel = action,
+                        duration = SnackbarDuration.Short
+                    ) == SnackbarResult.ActionPerformed
+                }
+            )
+
+            if (isFabExpanded) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.4f))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            isFabExpanded = false
+                        }
+                )
             }
 
-        )
+            if (showFab) {
+                SpeedDialFab(
+                    isExpanded = isFabExpanded,
+                    onExpandChanged = { isFabExpanded = it },
+                    items = listOf(
+                        SpeedDialItem(
+                            icon = Icons.Default.Remove,
+                            label = "Bestand entnehmen",
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                            onClick = {
+                                appState.navController.navigateToItemConsume()
+                            }
+                        ),
+                        SpeedDialItem(
+                            icon = Icons.Default.SwapHoriz,
+                            label = "Bestand umlagern",
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            onClick = {
+                                appState.navController.navigateToItemRelocate()
+                            }
+                        ),
+                        SpeedDialItem(
+                            icon = Icons.Default.QrCodeScanner,
+                            label = "Mit Barcode eintragen",
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            onClick = {
+                                appState.navController.navigateToItemEntry(triggerScan = true)
+                            }
+                        ),
+                        SpeedDialItem(
+                            icon = Icons.Default.Add,
+                            label = "Manuell eintragen",
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            onClick = {
+                                appState.navController.navigateToItemEntry()
+                            }
+                        )
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(
+                            bottom = paddingValues.calculateBottomPadding() + 16.dp,
+                            end = 16.dp
+                        )
+                )
+            }
+        }
     }
 }
 

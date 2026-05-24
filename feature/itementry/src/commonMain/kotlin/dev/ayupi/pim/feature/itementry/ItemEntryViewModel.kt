@@ -5,6 +5,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.ayupi.pim.core.data.repository.StorageRepository
+import dev.ayupi.pim.core.data.repository.UserDataRepository
 import dev.ayupi.pim.core.model.Item
 import dev.ayupi.pim.core.model.Storage
 import dev.ayupi.pim.core.model.StorageItem
@@ -27,21 +28,25 @@ import kotlinx.datetime.LocalDate
 
 class ItemEntryViewModel(
     private val itemId: String?,
-    private val repository: StorageRepository
+    private val repository: StorageRepository,
+    private val userDataRepository: UserDataRepository
 ) : ViewModel() {
+
     private val _formState = MutableStateFlow(ItemFormState())
     val uiState = flow {
         emit(ItemEntryUiState.Loading)
-        val (existingItem, storages, items) = coroutineScope {
-            val itemDeferred = async {
-                itemId?.let {
-                    repository.getStorageItemById(itemId).firstOrNull()
-                }
-            }
-            val storagesDeferred = async { repository.getStorages().first() }
-            val itemsDeferred = async { repository.getItems().first() }
+        
+        val existingItem = itemId?.let {
+            repository.getStorageItemById(itemId).firstOrNull()
+        }
+        val storages = repository.getStorages().first()
+        val items = repository.getItems().first()
+        val userData = userDataRepository.data.first()
 
-            Triple(itemDeferred.await(), storagesDeferred.await(), itemsDeferred.await())
+        if (itemId == null && _formState.value.selectedStorageId == null) {
+            _formState.update {
+                it.copy(selectedStorageId = userData.lastSelectedStorageId ?: storages.firstOrNull()?.id)
+            }
         }
         existingItem?.let {
             _formState.update {
@@ -177,6 +182,9 @@ class ItemEntryViewModel(
 
     fun onStorageChange(storageId: String) {
         _formState.update { it.copy(selectedStorageId = storageId) }
+        viewModelScope.launch {
+            userDataRepository.setLastSelectedStorageId(storageId)
+        }
     }
 
     fun onExpirationDateChange(date: LocalDate?) {
@@ -266,7 +274,7 @@ data class ItemFormState(
     val name: TextFieldValue = TextFieldValue(), // TextfieldValue - cursor position
     val nameError: String? = null,
     val barcode: String = "",
-    val quantity: String = "",
+    val quantity: String = "1",
     val quantityError: String? = null,
     val size: String = "",
     val sizeError: String? = null,

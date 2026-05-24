@@ -6,6 +6,6 @@ import org.koin.dsl.module
 
 val itemEntryModule = module {
     viewModel<ItemEntryViewModel> { (itemId: String?) ->
-        ItemEntryViewModel(itemId, get())
+        ItemEntryViewModel(itemId, get(), get())
     }
 }

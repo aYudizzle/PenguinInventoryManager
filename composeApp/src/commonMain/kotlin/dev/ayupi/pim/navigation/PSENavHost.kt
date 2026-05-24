@@ -17,6 +17,7 @@ import dev.ayupi.pim.feature.storagedetails.navigation.navigateToStorageDetails
 import dev.ayupi.pim.feature.storagedetails.navigation.storageDetailsScreen
 import dev.ayupi.pim.feature.storageoverview.navigation.storageOverviewScreen
 import dev.ayupi.pim.feature.itemconsume.itemConsumeScreen
+import dev.ayupi.pim.feature.itemrelocate.itemRelocateScreen
 
 @Composable
 fun PSENavHost(
@@ -47,6 +48,10 @@ fun PSENavHost(
             onNavigateBack = navController::navigateUp,
         )
         itemConsumeScreen(
+            modifier = Modifier.padding(paddingValues),
+            onNavigateBack = navController::navigateUp,
+        )
+        itemRelocateScreen(
             modifier = Modifier.padding(paddingValues),
             onNavigateBack = navController::navigateUp,
         )

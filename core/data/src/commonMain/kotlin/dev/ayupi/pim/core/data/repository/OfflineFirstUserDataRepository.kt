@@ -23,4 +23,8 @@ class OfflineFirstUserDataRepository(
     override suspend fun setExpirationWarningDays(days: Int) {
         settingsDataSource.setExpirationWarningDays(days)
     }
+
+    override suspend fun setLastSelectedStorageId(storageId: String?) {
+        settingsDataSource.setLastSelectedStorageId(storageId)
+    }
 }
