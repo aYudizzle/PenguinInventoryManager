@@ -9,21 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-sealed interface ItemConsumeUiState {
-    data object Scanning : ItemConsumeUiState
-    data class ProductNotFound(val barcode: String) : ItemConsumeUiState
-    data class ConfirmSingleLocation(
-        val storageItem: StorageItem,
-        val quantityToRemove: Long = 1
-    ) : ItemConsumeUiState
-    data class SelectLocation(
-        val barcode: String,
-        val productName: String,
-        val locations: List<StorageItem>
-    ) : ItemConsumeUiState
-    data class Success(val message: String) : ItemConsumeUiState
-}
-
 class ItemConsumeViewModel(
     private val storageRepository: StorageRepository
 ) : ViewModel() {
@@ -69,4 +54,19 @@ class ItemConsumeViewModel(
     fun resetToScanning() {
         _uiState.value = ItemConsumeUiState.Scanning
     }
+}
+
+sealed interface ItemConsumeUiState {
+    data object Scanning : ItemConsumeUiState
+    data class ProductNotFound(val barcode: String) : ItemConsumeUiState
+    data class ConfirmSingleLocation(
+        val storageItem: StorageItem,
+        val quantityToRemove: Long = 1
+    ) : ItemConsumeUiState
+    data class SelectLocation(
+        val barcode: String,
+        val productName: String,
+        val locations: List<StorageItem>
+    ) : ItemConsumeUiState
+    data class Success(val message: String) : ItemConsumeUiState
 }

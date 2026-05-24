@@ -11,26 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-sealed interface ItemRelocateUiState {
-    data object Scanning : ItemRelocateUiState
-    data class ProductNotFound(val barcode: String) : ItemRelocateUiState
-    data class SelectSource(
-        val barcode: String,
-        val productName: String,
-        val locations: List<StorageItem>
-    ) : ItemRelocateUiState
-    data class SelectTarget(
-        val sourceStorageItem: StorageItem,
-        val availableStorages: List<Storage>
-    ) : ItemRelocateUiState
-    data class Confirm(
-        val sourceStorageItem: StorageItem,
-        val targetStorage: Storage,
-        val quantityToMove: Long = 1
-    ) : ItemRelocateUiState
-    data class Success(val message: String) : ItemRelocateUiState
-}
-
 class ItemRelocateViewModel(
     private val storageRepository: StorageRepository
 ) : ViewModel() {
@@ -84,4 +64,24 @@ class ItemRelocateViewModel(
     fun resetToScanning() {
         _uiState.value = ItemRelocateUiState.Scanning
     }
+}
+
+sealed interface ItemRelocateUiState {
+    data object Scanning : ItemRelocateUiState
+    data class ProductNotFound(val barcode: String) : ItemRelocateUiState
+    data class SelectSource(
+        val barcode: String,
+        val productName: String,
+        val locations: List<StorageItem>
+    ) : ItemRelocateUiState
+    data class SelectTarget(
+        val sourceStorageItem: StorageItem,
+        val availableStorages: List<Storage>
+    ) : ItemRelocateUiState
+    data class Confirm(
+        val sourceStorageItem: StorageItem,
+        val targetStorage: Storage,
+        val quantityToMove: Long = 1
+    ) : ItemRelocateUiState
+    data class Success(val message: String) : ItemRelocateUiState
 }
