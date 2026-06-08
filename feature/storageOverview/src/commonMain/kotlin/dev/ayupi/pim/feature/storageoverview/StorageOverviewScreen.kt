@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -104,12 +105,15 @@ fun StorageOverviewContent(
 
             LazyColumn(
                 modifier = modifier,
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item {
                     AddStorageCard(onClick = onAddStorageClick)
                 }
                 items(state.storages, key = { it.id }) {
                     StorageCard(
+                        modifier = Modifier.animateItem(),
                         storage = it,
                         onClick = {
                             val now = System.currentTimeMillis()
@@ -172,12 +176,13 @@ fun StorageCard(
     onClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val (iconBgColor, iconTintColor) = rememberStorageColors(storage.name)
     var showMenu by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick),
@@ -291,7 +296,6 @@ fun AddStorageCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 16.dp)
             .clip(RoundedCornerShape(16.dp))
             .dashedBorder(
                 width = 2.dp,

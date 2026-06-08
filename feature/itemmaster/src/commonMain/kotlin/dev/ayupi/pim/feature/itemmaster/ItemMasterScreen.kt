@@ -152,12 +152,14 @@ fun LoadedContent(
                 }
             }
             items(items, key = { it.id }) { item ->
-                ItemMasterRow(
-                    item = item,
-                    onEdit = { onEditClick(item) },
-                    onDelete = { onDeleteClick(item) }
-                )
-                HorizontalDivider()
+                Column(modifier = Modifier.animateItem()) {
+                    ItemMasterRow(
+                        item = item,
+                        onEdit = { onEditClick(item) },
+                        onDelete = { onDeleteClick(item) }
+                    )
+                    HorizontalDivider()
+                }
             }
         }
     }

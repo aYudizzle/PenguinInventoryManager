@@ -1,9 +1,15 @@
 package dev.ayupi.pim.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import dev.ayupi.pim.app.PSEAppState
 import dev.ayupi.pim.feature.inventory.navigation.InventoryRoute
@@ -12,9 +18,11 @@ import dev.ayupi.pim.feature.itementry.navigation.itemEntryScreen
 import dev.ayupi.pim.feature.itementry.navigation.navigateToItemEntry
 import dev.ayupi.pim.feature.itemmaster.navigation.itemMasterScreen
 import dev.ayupi.pim.feature.itemmaster.navigation.navigateToItemMaster
+import dev.ayupi.pim.feature.settings.navigation.SettingsRoute
 import dev.ayupi.pim.feature.settings.navigation.settingsScreen
 import dev.ayupi.pim.feature.storagedetails.navigation.navigateToStorageDetails
 import dev.ayupi.pim.feature.storagedetails.navigation.storageDetailsScreen
+import dev.ayupi.pim.feature.storageoverview.navigation.StorageOverviewRoute
 import dev.ayupi.pim.feature.storageoverview.navigation.storageOverviewScreen
 import dev.ayupi.pim.feature.itemconsume.itemConsumeScreen
 import dev.ayupi.pim.feature.itemrelocate.itemRelocateScreen
@@ -31,6 +39,54 @@ fun PSENavHost(
         navController = navController,
         startDestination = InventoryRoute,
         modifier = modifier,
+        enterTransition = {
+            val initialDest = initialState.destination
+            val targetDest = targetState.destination
+            if (initialDest.isTopLevel() && targetDest.isTopLevel()) {
+                fadeIn(animationSpec = tween(220))
+            } else {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(300))
+            }
+        },
+        exitTransition = {
+            val initialDest = initialState.destination
+            val targetDest = targetState.destination
+            if (initialDest.isTopLevel() && targetDest.isTopLevel()) {
+                fadeOut(animationSpec = tween(220))
+            } else {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
+            }
+        },
+        popEnterTransition = {
+            val initialDest = initialState.destination
+            val targetDest = targetState.destination
+            if (initialDest.isTopLevel() && targetDest.isTopLevel()) {
+                fadeIn(animationSpec = tween(220))
+            } else {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(300))
+            }
+        },
+        popExitTransition = {
+            val initialDest = initialState.destination
+            val targetDest = targetState.destination
+            if (initialDest.isTopLevel() && targetDest.isTopLevel()) {
+                fadeOut(animationSpec = tween(220))
+            } else {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
+            }
+        }
     ) {
         storageOverviewScreen(
             modifier = Modifier.padding(paddingValues),
@@ -69,4 +125,10 @@ fun PSENavHost(
             onItemClick = { navController.navigateToItemEntry(it) }
         )
     }
+}
+
+private fun NavDestination.isTopLevel(): Boolean {
+    return hasRoute(StorageOverviewRoute::class) ||
+           hasRoute(InventoryRoute::class) ||
+           hasRoute(SettingsRoute::class)
 }

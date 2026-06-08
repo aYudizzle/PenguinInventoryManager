@@ -172,6 +172,7 @@ fun LoadedContent(
                         }
 
                         SwipeToDismissBox(
+                            modifier = Modifier.animateItem(),
                             state = dismissState,
                             backgroundContent = {
                                 val color = when (dismissState.dismissDirection) {

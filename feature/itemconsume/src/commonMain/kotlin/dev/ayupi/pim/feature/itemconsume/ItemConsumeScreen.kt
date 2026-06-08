@@ -1,17 +1,8 @@
 package dev.ayupi.pim.feature.itemconsume
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,27 +15,8 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,10 +27,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.ayupi.pim.core.ui.components.BarcodeScannerButton
 import dev.ayupi.pim.core.model.StorageItem
-import dev.ayupi.pim.core.model.StorageUnit
-import kotlinx.datetime.LocalDate
+import dev.ayupi.pim.core.ui.components.BarcodeScannerButton
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,54 +58,59 @@ fun ItemConsumeScreen(
                     }
                 }
             )
-            when (val state = uiState) {
-                ItemConsumeUiState.Scanning -> {
-                    ScanningView(
-                        onBarcodeScanned = viewModel::onBarcodeScanned,
-                        onCancel = onNavigateBack
-                    )
-                }
+            AnimatedContent(
+                targetState = uiState,
+                label = "ItemConsumeStateTransition"
+            ) { state ->
+                when (state) {
+                    ItemConsumeUiState.Scanning -> {
+                        ScanningView(
+                            onBarcodeScanned = viewModel::onBarcodeScanned,
+                            onCancel = onNavigateBack
+                        )
+                    }
 
-                is ItemConsumeUiState.ProductNotFound -> {
-                    ProductNotFoundView(
-                        barcode = state.barcode,
-                        onScanAgain = viewModel::resetToScanning,
-                        onCancel = onNavigateBack
-                    )
-                }
+                    is ItemConsumeUiState.ProductNotFound -> {
+                        ProductNotFoundView(
+                            barcode = state.barcode,
+                            onScanAgain = viewModel::resetToScanning,
+                            onCancel = onNavigateBack
+                        )
+                    }
 
-                is ItemConsumeUiState.ConfirmSingleLocation -> {
-                    var quantityToRemove by remember { mutableStateOf(1L) }
-                    val maxQty = state.storageItem.quantity
+                    is ItemConsumeUiState.ConfirmSingleLocation -> {
+                        var quantityToRemove by remember(state) { mutableStateOf(1L) }
+                        val maxQty = state.storageItem.quantity
 
-                    ConfirmSingleView(
-                        storageItem = state.storageItem,
-                        quantityToRemove = quantityToRemove,
-                        maxQuantity = maxQty,
-                        onQuantityChange = { quantityToRemove = it },
-                        onConfirm = {
-                            viewModel.onConfirmConsume(state.storageItem, quantityToRemove)
-                        },
-                        onCancel = onNavigateBack
-                    )
-                }
+                        ConfirmSingleView(
+                            storageItem = state.storageItem,
+                            quantityToRemove = quantityToRemove,
+                            maxQuantity = maxQty,
+                            onQuantityChange = { quantityToRemove = it },
+                            onConfirm = {
+                                viewModel.onConfirmConsume(state.storageItem, quantityToRemove)
+                            },
+                            onCancel = onNavigateBack
+                        )
+                    }
 
-                is ItemConsumeUiState.SelectLocation -> {
-                    SelectLocationView(
-                        productName = state.productName,
-                        barcode = state.barcode,
-                        locations = state.locations,
-                        onLocationSelected = viewModel::onSelectLocation,
-                        onCancel = onNavigateBack
-                    )
-                }
+                    is ItemConsumeUiState.SelectLocation -> {
+                        SelectLocationView(
+                            productName = state.productName,
+                            barcode = state.barcode,
+                            locations = state.locations,
+                            onLocationSelected = viewModel::onSelectLocation,
+                            onCancel = onNavigateBack
+                        )
+                    }
 
-                is ItemConsumeUiState.Success -> {
-                    SuccessView(
-                        message = state.message,
-                        onScanAgain = viewModel::resetToScanning,
-                        onFinished = onNavigateBack
-                    )
+                    is ItemConsumeUiState.Success -> {
+                        SuccessView(
+                            message = state.message,
+                            onScanAgain = viewModel::resetToScanning,
+                            onFinished = onNavigateBack
+                        )
+                    }
                 }
             }
         }
@@ -560,7 +535,7 @@ fun SuccessView(
         Icon(
             imageVector = Icons.Default.CheckCircle,
             contentDescription = "Erfolgreich",
-            tint = Color(0xFF4CAF50),
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(96.dp)
         )
 
